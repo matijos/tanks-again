@@ -13,7 +13,7 @@ class Player:
         self.vel = 0
         self.vel_dir = 0
         self.color = col
-        self.bullet = None
+        self.bullets = []
         self.health = 70
 
     def draw(self, sur):
@@ -22,7 +22,13 @@ class Player:
         d = self.pos + cmath.rect(1.5 * self.radius, radians(self.dir))
         pygame.draw.line(sur, BLACK, (int(c.real), int(c.imag)), (int(d.real), int(d.imag)), 3)
 
-        v = -50-(self.radius+40)*1j # vector (-50, -(r+40)
+
+        if self.pos.imag < HEIGHT/2:
+            v = -50 - (self.radius + 40) * 1j  # vector (-50, -(r+40)
+        else:
+            v = -50 + (self.radius + 20) * 1j
+
+
         healthbar_pos = self.pos + v
         pygame.draw.rect(sur, BLACK, (int(healthbar_pos.real), int(healthbar_pos.imag), 100, 20))
         pygame.draw.rect(sur, WHITE, (int(healthbar_pos.real), int(healthbar_pos.imag), self.health, 20))
@@ -73,15 +79,16 @@ class Player:
             self.pos = self.pos - cmath.rect(self.vel, radians(self.dir))
         if self.collides_with_other_player(other_player):
             self.pos = self.pos - cmath.rect(self.vel, radians(self.dir))
-        if self.bullet is not None:
-            if self.bullet.collides_with_player(other_player):
+        for b in self.bullets:
+            if b.collides_with_player(other_player):
                 other_player.health -= 10
-                self.bullet = None
+                b = None
 
 
 
     def fire_bullet(self):
-        self.bullet = Bullet(self.pos, 10, self.dir)
+        b = Bullet(self.pos, 10, self.dir)
+        self.bullets.append(b)
 
 
 
